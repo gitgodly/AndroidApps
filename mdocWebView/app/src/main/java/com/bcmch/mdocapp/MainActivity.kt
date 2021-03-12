@@ -1,4 +1,5 @@
 package com.bcmch.mdocapp
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -9,19 +10,19 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
+    val appurl = "https://tm.mybcmch.com"
+
+    @SuppressLint("AddJavascriptInterface", "SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val webViewClient = WebViewClient()
         val webView = WebView(this)
         webView.webViewClient=WebViewClient()
-        webView.webChromeClient = WebChromeClient();
-        webView.settings.setJavaScriptEnabled(true);
-        webView.settings.setDomStorageEnabled(true);
+        webView.webChromeClient = WebChromeClient()
+        webView.settings.setJavaScriptEnabled(true)
+        webView.settings.setDomStorageEnabled(true)
         webView.addJavascriptInterface(WebAppInterface(this), "Android")
         setContentView(webView)
-        webView.loadUrl("https://tm.mybcmch.com");
-
-
+        webView.loadUrl(appurl)
     }
 
 
