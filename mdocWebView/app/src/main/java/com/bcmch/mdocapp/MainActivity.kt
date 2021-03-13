@@ -1,6 +1,8 @@
 package com.bcmch.mdocapp
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.JavascriptInterface
@@ -15,22 +17,39 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("AddJavascriptInterface", "SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val webView = WebView(this)
-        webView.webViewClient=WebViewClient()
-        webView.webChromeClient = WebChromeClient()
-        webView.settings.setJavaScriptEnabled(true)
-        webView.settings.setDomStorageEnabled(true)
-        webView.addJavascriptInterface(WebAppInterface(this), "Android")
-        setContentView(webView)
-        webView.loadUrl(appurl)
+        if(!isNetworkAvailable())
+        {
+            Toast.makeText(this,"Sorry, there is no internet connection",Toast.LENGTH_LONG).show();
+            val webView = WebView(this)
+            setContentView(webView)
+            webView.loadUrl("file:///android_asset/405.html")
+
+            return;
+        }
+        else {
+            val webView = WebView(this)
+            webView.webViewClient = WebViewClient()
+            webView.webChromeClient = WebChromeClient()
+            webView.settings.javaScriptEnabled = true
+            webView.settings.domStorageEnabled = true
+            webView.addJavascriptInterface(WebAppInterface(this), "Android")
+            setContentView(webView)
+
+            webView.loadUrl(appurl)
+        }
     }
 
-
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE)
+        return if (connectivityManager is ConnectivityManager) {
+            val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+            networkInfo?.isConnected ?: false
+        } else false
+    }
 }
-/** Instantiate the interface and set the context  */
-class WebAppInterface(private val mContext: Context) {
 
-    /** Show a toast from the web page  */
+
+class WebAppInterface(private val mContext: Context) {
     @JavascriptInterface
     fun showToast(toast: String) {
         Toast.makeText(mContext, toast, Toast.LENGTH_LONG).show()
